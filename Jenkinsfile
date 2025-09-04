@@ -4,27 +4,26 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from the repository
-                checkout scm
+                git branch: 'main', url: 'https://github.com/sreerag160/Web-project.git'
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image with tag 'web-project'
-                    docker.build('web-project')
+                    sh 'docker build -t web-project .'
                 }
             }
         }
-        stage('Test Docker Image') {
+
+        stage('Deploy Container') {
             steps {
                 script {
-                    // Run the Docker container in detached mode
-                    def container = docker.image('web-project').run('-d -p 8080:80')
-                    // Wait for a few seconds to let the container start
-                    sleep 10
-                    // Stop the container after test
-                    container.stop()
+                    sh '''
+                        docker stop web-project-container || true
+                        docker rm web-project-container || true
+                        docker run -d -p 9090:80 --name web-project-container web-project
+                    '''
                 }
             }
         }
