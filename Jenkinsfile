@@ -11,7 +11,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t web-project .'
+                    bat 'docker build -t web-project .'
                 }
             }
         }
@@ -19,9 +19,9 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    sh '''
-                        docker stop web-project-container || true
-                        docker rm web-project-container || true
+                    bat '''
+                        docker stop web-project-container || exit 0
+                        docker rm web-project-container || exit 0
                         docker run -d -p 9090:80 --name web-project-container web-project
                     '''
                 }
